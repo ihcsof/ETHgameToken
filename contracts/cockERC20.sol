@@ -12,8 +12,9 @@ pragma solidity ^0.8.2;
 // Using OpenZeppelin's standard ERC20 implementation
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract CockfundingToken is ERC20, Ownable {
+contract CockfundingToken is ERC20, Ownable, Pausable {
     uint256 public tokenPrice;        // Price of one token in wei (ETH)
     uint256 public totalRaised;       // Total amount of ETH raised for the cock project
     uint256 public softCap;           // Minimum amount of ETH required for cock success
@@ -68,7 +69,22 @@ contract CockfundingToken is ERC20, Ownable {
         deadline = block.timestamp + _duration; // start from... now!
         
         // Mint tokens to the contract for sale (for simplicity, a fixed supply)
-        _mint(address(this), 1_069_069 ** decimals());
+        _mint(address(this), 1_069_069 * 10 ** decimals());
+    }
+
+    /*
+     EMERGCENCY! The ICO can be paused.
+     While paused, no one can buy tokens.
+    */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /*
+     Allows the owner to resume the ICO once the emergency is resolved :)
+    */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /*
@@ -76,12 +92,13 @@ contract CockfundingToken is ERC20, Ownable {
         aka when someone sends ETH to this contract without specifying any 
         specific function to execute, it will automatically run the receive function
     */
-    receive() external payable {
+    receive() external payable whenNotPaused {
         buyTokens();
     }
 
+
     // Allows users to buy tokens at the set price until the deadline or finalization.
-    function buyTokens() public payable {
+    function buyTokens() public payable whenNotPaused {
         require(!isFinalized, "ICO already finalized!");
         require(block.timestamp <= deadline, "ICO duration is over");
         require(msg.value > 0, "Send ETH to buy tokens");
@@ -170,6 +187,30 @@ contract CockfundingToken is ERC20, Ownable {
             return 0;
     
         return deadline - block.timestamp;
+    }
+
+    /*
+     Returns how many tokens are remaining for sale in the contract.
+    */
+    function tokensRemaining() external view returns (uint256) {
+        return balanceOf(address(this));
+    }
+
+    /*
+     Returns both the ETH contribution of a given contributor and the 
+     equivalent amount of tokens they would have received at the current token price.
+    */
+    function contributionDetails(address contributor) external view returns (uint256 contributionAmount, uint256 tokenEquivalent) {
+        contributionAmount = contributions[contributor];
+        tokenEquivalent = contributionAmount / tokenPrice;
+    }
+
+     /*
+     Returns how many tokens a user would get for a given amount of ETH.
+        --> to help frontend showing expected tokens before the user sends ETH.
+    */
+    function tokensForEth(uint256 ethAmount) external view returns (uint256) {
+        return ethAmount / tokenPrice;
     }
 
 }
