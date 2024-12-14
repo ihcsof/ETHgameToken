@@ -15,16 +15,25 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 contract CockfundingToken is ERC20, Ownable, Pausable {
-    uint256 public tokenPrice;        // Price of one token in wei (ETH)
-    uint256 public totalRaised;       // Total amount of ETH raised for the cock project
-    uint256 public softCap;           // Minimum amount of ETH required for cock success
-    uint256 public deadline;          // Timestamp after which cock ICO can be finalized
+    uint256 public immutable tokenPrice;        // Price of one token in wei (ETH)
+    uint256 public totalRaised;                 // Total amount of ETH raised for the cock project
+    uint256 public immutable softCap;           // Minimum amount of ETH required for cock success
+    uint256 public immutable deadline;          // Timestamp after which cock ICO can be finalized
+    uint256 public immutable minContribution;   // To avoid cluttering!
 
     bool public isFinalized;          // Has the cock ICO been finalized?
     bool public isSuccessful;         // Hopefully Cock Fight Sim will meet the soft cap!
 
+    uint256 public immutable earlyBirdBonus;    // Bonus percentage for early birds
+    uint256 public immutable earlyBirdDuration; // Early bird period
+
     // Tracks ETH contributions for EACH address
     mapping(address => uint256) public contributions;
+
+    // Leaderboard variables (Fixed top 5 contributors!)
+    uint256 public constant leaderboardSize = 5;
+    address[leaderboardSize] public leaderboardAddresses;
+    uint256[leaderboardSize] public leaderboardContributions;
 
     // Raising events it's important for both logging and for off-chain integrations
     /*
@@ -49,14 +58,17 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
     event Refunded(address indexed buyer, uint256 amount);
     event Finalized(bool successful);
     event Withdrawal(address indexed owner, uint256 amount);
+    event LeaderboardUpdated(address indexed contributor, uint256 contribution);
 
     /*
      Constructor sets token details and initial conditions, with following params:
         _tokenPrice The price of a single token in wei
         _softCap The minimum amount of ETH required for the cock to be successful.
         _duration The (seconds) duration for which the cock ICO will remain active.
+        _earlyBirdBonus The bonus percentage for early birds.
+        _earlyBirdDuration The duration of the early bird period in seconds.
     */
-    constructor(uint256 _tokenPrice, uint256 _softCap, uint256 _duration) 
+    constructor(uint256 _tokenPrice, uint256 _softCap, uint256 _duration, uint256 _earlyBirdBonus, uint256 _earlyBirdDuration, uint256 _minContribution) 
         ERC20("CockFundingToken", "CFT")
         Ownable(msg.sender)
     {
@@ -67,13 +79,20 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         tokenPrice = _tokenPrice;
         softCap = _softCap;
         deadline = block.timestamp + _duration; // start from... now!
-        
+
+        require(_earlyBirdDuration < _duration, "Early bird duration must be shorter than ICO duration");
+        earlyBirdBonus = _earlyBirdBonus;
+        earlyBirdDuration = _earlyBirdDuration;
+
+        require(_minContribution > 0, "You can't send 0 tokens!");
+        minContribution = _minContribution;
+
         // Mint tokens to the contract for sale (for simplicity, a fixed supply)
         _mint(address(this), 1_069_069 * 10 ** decimals());
     }
 
     /*
-     EMERGENCY! The ICO can be paused.
+     EMERGCENCY! The ICO can be paused.
      While paused, no one can buy tokens.
     */
     function pause() external onlyOwner {
@@ -96,19 +115,30 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         buyTokens();
     }
 
+    function calculateTokensWithBonus(uint256 ethAmount) internal view returns (uint256) {
+        uint256 tokens = ethAmount / tokenPrice;
+        if (block.timestamp <= deadline - earlyBirdDuration) {
+            // Apply bonus for the early cockers!
+            tokens = (ethAmount * (100 + earlyBirdBonus)) / 100 / tokenPrice;
+        }
+        return tokens;
+    }
 
     // Allows users to buy tokens at the set price until the deadline or finalization.
     function buyTokens() public payable whenNotPaused {
         require(!isFinalized, "ICO already finalized!");
         require(block.timestamp <= deadline, "ICO duration is over");
-        require(msg.value > 0, "Send ETH to buy tokens");
+        // No need to check if > 0, because minContribution is already > 0!
+        require(msg.value >= minContribution, "Contribution is too small");
 
-        uint256 tokenAmount = msg.value / tokenPrice;
+        uint256 tokenAmount = calculateTokensWithBonus(msg.value);
         require(tokenAmount > 0, "No Cock for you ^_^");
         require(balanceOf(address(this)) >= tokenAmount, "Holy, u poor");
 
         totalRaised += msg.value;
         contributions[msg.sender] += msg.value;
+
+        updateLeaderboard(msg.sender, contributions[msg.sender]);
 
         _transfer(address(this), msg.sender, tokenAmount);
 
@@ -132,15 +162,15 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
             isSuccessful = true;
             uint256 amount = address(this).balance;
 
-            // We pass an empty bytes array ti save gas (so we ignore the second output)
+            // We pass an empty bytes array to save gas (so we ignore the second output)
             (bool success, ) = owner().call{value: amount}("");
-
             require(success, "Oh no! Transfer to owner failed");
 
             emit Withdrawal(owner(), amount);
-        } else
+        } else {
             // FAIL: Contributors will be able to claim refunds :(
             isSuccessful = false;
+        }
 
         emit Finalized(isSuccessful);
     }
@@ -153,14 +183,14 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
     function claimRefund() public {
         require(isFinalized, "Hold up! Not so fast :'(");
         require(!isSuccessful, "ICO was successful, go play with Cocks!");
-        
+
         uint256 contribution = contributions[msg.sender];
         require(contribution > 0, "No contributions to refund, u don't fool us!");
 
         // As seen in lesson, let's put the value at zero BEFORE the claim!
         contributions[msg.sender] = 0;
 
-        // For a genoese person this is the worst part
+        // For a genoese person this is the worst part 
         (bool success, ) = msg.sender.call{value: contribution}("");
         require(success, "Refund transfer failed");
 
@@ -183,9 +213,7 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
      If already past the deadline, returns 0.
     */
     function timeUntilDeadline() external view returns (uint256) {
-        if (block.timestamp >= deadline)
-            return 0;
-    
+        if (block.timestamp >= deadline) return 0;
         return deadline - block.timestamp;
     }
 
@@ -205,12 +233,49 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         tokenEquivalent = contributionAmount / tokenPrice;
     }
 
-     /*
+    /*
      Returns how many tokens a user would get for a given amount of ETH.
         --> to help frontend showing expected tokens before the user sends ETH.
     */
     function tokensForEth(uint256 ethAmount) external view returns (uint256) {
-        return ethAmount / tokenPrice;
+        return calculateTokensWithBonus(ethAmount); // early bird logic :)
     }
 
+    // We need to store the top cocks!
+    function updateLeaderboard(address contributor, uint256 contribution) internal {
+        // You! Yes, You! Let's see if you were already here and you added other contributions!
+        for (uint256 i = 0; i < leaderboardSize; i++) {
+            if (leaderboardAddresses[i] == contributor) {
+                leaderboardContributions[i] = contribution;
+                sortLeaderboard(); // Sort only if the value has been updated
+                emit LeaderboardUpdated(contributor, contribution);
+                return;
+            }
+        }
+
+        // Ok you weren't already here, but let's see if you will!
+        uint256 smallestContribution = leaderboardContributions[leaderboardSize - 1];
+        if (contribution > smallestContribution) {
+            leaderboardAddresses[leaderboardSize - 1] = contributor;
+            leaderboardContributions[leaderboardSize - 1] = contribution;
+            sortLeaderboard(); // OPT: Sort only if a new contributor enters
+            emit LeaderboardUpdated(contributor, contribution);
+        }
+    }
+
+    // Naive bubble sort because at the end we only have 5 elements ^_^
+    function sortLeaderboard() internal {
+        for (uint256 i = 0; i < leaderboardSize - 1; i++) {
+            for (uint256 j = i + 1; j < leaderboardSize; j++) {
+                if (leaderboardContributions[i] < leaderboardContributions[j]) {
+                    (leaderboardAddresses[i], leaderboardAddresses[j]) = (leaderboardAddresses[j], leaderboardAddresses[i]);
+                    (leaderboardContributions[i], leaderboardContributions[j]) = (leaderboardContributions[j], leaderboardContributions[i]);
+                }
+            }
+        }
+    }
+
+    function getLeaderboard() external view returns (address[leaderboardSize] memory, uint256[leaderboardSize] memory) {
+        return (leaderboardAddresses, leaderboardContributions);
+    }
 }
