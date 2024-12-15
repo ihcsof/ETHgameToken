@@ -1,5 +1,11 @@
 # Crowdfunding CockFightSimulator
+## Decentralized System master course
 ## Assignment 1 & 3 - Smart Contract + Website
+## Authors ##
+- Lorenzo Foschi
+- Kevin Cattaneo 
+
+# How-to
 
 The website is located in the _crowdfunding_ folder.
 
