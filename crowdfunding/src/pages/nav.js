@@ -4,26 +4,30 @@ import CockLogo from '../images/logo.png'
 import { NavLink } from 'react-router-dom';
 
 function Nav() {
-  return (
-    <Container>
-      <NavLink to='/'>
-        <Logo src={CockLogo} />
-      </NavLink>
-      <NavContainer>
-          <Section>
-          Funding
-          </Section>
-          <Section>
-          Heroes
-          </Section>
-      </NavContainer>
-      <BurgerContainer>
-        <Meat />
-        <Meat />
-        <Meat />
-      </BurgerContainer>
-    </Container>)
-  ;
+    const handleRedirection = (address) => {
+        window.location.href = '/' + address;
+    };
+
+    return (
+        <Container>
+            <NavLink to='/'>
+                <Logo src={CockLogo} />
+            </NavLink>
+            <NavContainer>
+                <Section onClick={() => handleRedirection('funding')}>
+                    Funding
+                </Section>
+                <Section onClick={() => handleRedirection('heroes')}>
+                    Heroes
+                </Section>
+            </NavContainer>
+            <BurgerContainer>
+                <Meat />
+                <Meat />
+                <Meat />
+            </BurgerContainer>
+        </Container>)
+        ;
 }
 
 const Container = styled.div`
@@ -76,8 +80,8 @@ const Logo = styled.img`
 const Section = styled.div`
   color: #FFF;
   text-align: center;
-  font-family: 'Fira Sans'; // Delete When Kevin Merge His Pull Request
-  font-size: 16px;
+  font-family: 'Fira Sans';
+  font-size: 20px;
   font-style: normal;
   font-weight: 500;
   line-height: 18px;

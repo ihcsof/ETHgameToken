@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Nav from './nav';
+import styled from 'styled-components';
 import { Button, Form, Input, Segment, Header } from 'semantic-ui-react';
 import { getContractDetails, contribute, withdraw } from '../ethereum'; // Import the Ethereum functions
 
@@ -68,7 +70,8 @@ function Funding() {
   };
 
   return (
-     <div>
+    <Container>
+      <Nav />
       <Segment>
         <Header as="h2">Crowdfunding Campaign</Header>
         <p>Goal: {goal} ETH</p>
@@ -94,8 +97,11 @@ function Funding() {
       <Segment>
         <Button color="green" onClick={handleWithdraw}>Withdraw Funds</Button>
       </Segment>
-    </div>
+    </Container>
   )
 }
+
+const Container = styled.div`
+`;
 
 export default Funding;
