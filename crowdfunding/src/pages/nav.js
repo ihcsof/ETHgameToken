@@ -1,24 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
-// import UnigeLogo from '../svgs/UnigeConnect.svg';
-// import ArrowIcon from '../svgs/arrow.svg';
+import CockLogo from '../images/logo.png'
 import { NavLink } from 'react-router-dom';
 
 function Nav() {
   return (
     <Container>
       <NavLink to='/'>
-        {/* <Logo src={UnigeLogo} /> */}
+        <Logo src={CockLogo} />
       </NavLink>
       <NavContainer>
           <Section>
-          About
+          Funding
           </Section>
           <Section>
-          Support
-          </Section>
-          <Section>
-          Signin
+          Heroes
           </Section>
       </NavContainer>
       <BurgerContainer>
@@ -40,7 +36,7 @@ const Container = styled.div`
   padding: 0px 15vw;
   height: 10vh;
   gap: 5vw;
-  background-color: var(--blue);
+  background-color: var(--black);
 `;
 
 const NavContainer = styled.div`
@@ -60,18 +56,19 @@ const NavContainer = styled.div`
     min-width: 100vw;
     top: 9vh;
     transform:  ${props => props.Active ? 'translateX(100%)' : 'translateX(0%)'};
-    background: var(--blue);
+    background: var(--green);
   }
 `;
 
 const Logo = styled.img`
-  cursor: pointer;
+    cursor: pointer;
+    
     @media screen and (max-width: 545px){
       width: 200px;
       height: auto;
     }
     @media screen and (max-width: 403pc){
-      width: 160px;
+      width: 300px;
       height: auto;
     }
 `;

@@ -1,37 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
-// import UnigeLogo from '../svgs/UnigeLogo.svg';
-// import DIBRIS from '../svgs/UnigeDIBRIS.svg';
-// import CONNECT from '../svgs/UnigeConnect.svg';
+import SteamLogo from '../images/steam.png';
+import KickStarterLogo from '../images/kickstarter.png';
 
 function Footer() {
-  return (
-      <Container>
-        <Flex>
-          {/* <Image src={UnigeLogo} />
-          <Image src={DIBRIS} />
-          <Image src={CONNECT} /> */}
-        </Flex>
-        <Flex>
-          <FlexColumn>
-            <Text>Università degli Studi di Genova</Text>
-            <Text>Via Balbi 5, 16126 Genova</Text>
-          </FlexColumn>
-          <FlexColumn>
-            <Text>tel +39 01020991</Text>
-            <Text>fax +39 0102099227</Text>
-          </FlexColumn>
-          <FlexColumn>
-            <Text>protocollo@</Text>
-            <Text>pec.unige.it</Text>
-          </FlexColumn>
-          <FlexColumn>
-            <Text>Partita IVA</Text>
-            <Text>00754150100</Text>
-          </FlexColumn>
-        </Flex>
-      </Container>
-  );
+    return (
+        <Container>
+            <Flex>
+                <FlexColumn>
+                    <a href='https://store.steampowered.com/app/3330460/Cock_Fight_Simulator/'><Image src={SteamLogo} /></a>
+                    <Text>Find us on Steam!</Text>
+                </FlexColumn>
+                <FlexColumn>
+                    <a href='https://www.kickstarter.com/projects/cockfightsimulator/cock-fight-simulator'><Image src={KickStarterLogo} /></a>
+                    <Text>Join us on KickStarter!</Text>
+                </FlexColumn>
+            </Flex>
+        </Container>
+    );
 }
 
 const Container = styled.div`
@@ -40,8 +26,18 @@ const Container = styled.div`
   justify-content: center;
   gap: 50px;
   min-height: 40vh;
-  background-color: var(--blue);
+  background-color: var(--black);
   padding: 5vh 15vw;
+`;
+
+const BigHeader = styled.div`
+    color: var(--light-blue);
+    text-align: center;
+    font-family: 'Roboto Slab';
+    font-size: 48px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
 `;
 
 const Flex = styled.div`
@@ -54,18 +50,20 @@ const Flex = styled.div`
 
 const FlexColumn = styled.div`
   display: flex;
+  align-items: center;
   flex-direction: column;
   gap: 20px;
 `;
 const Text = styled.div`
   color: white; 
   font-family: "Fira Sans";
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 200;
+  font-size: 24px;
+  font-style: bold;
 `;
 
 const Image = styled.img`
+    width: 100px;
+    height: 100px;
 `;
 
 export default Footer;
