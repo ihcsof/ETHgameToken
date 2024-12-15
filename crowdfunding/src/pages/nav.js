@@ -60,7 +60,7 @@ const NavContainer = styled.div`
     min-width: 100vw;
     top: 9vh;
     transform:  ${props => props.Active ? 'translateX(100%)' : 'translateX(0%)'};
-    background: var(--green);
+    background: var(--black);
   }
 `;
 

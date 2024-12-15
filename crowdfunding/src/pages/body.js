@@ -36,10 +36,10 @@ function Body() {
           <Text>
             Buy our tokens to help us!
           </Text>
-          <CustomButton onClick={() => handleRedirection('heroes')}>FUND NOW</CustomButton>
+          <CustomButton onClick={() => handleRedirection('funding')}>FUND NOW</CustomButton>
         </LeftSection>
-        <RightSection src={CockRight} />
-        <RightSection src={CockLeft} />
+        <RightSection src={CockRight} onClick={() => handleRedirection('game')}/>
+        <RightSection src={CockLeft} onClick={() => handleRedirection('game')}/>
         <LeftSection>
           <Header>
             Assignment
@@ -50,7 +50,6 @@ function Body() {
           <Text>
             a.y. 2024/25
           </Text>
-          <CustomButton onClick={() => handleRedirection('heroes')}>FUND NOW</CustomButton>
         </LeftSection>
       </SubContainer>
     </Container>
@@ -167,7 +166,7 @@ const Text = styled.div`
 `;
 
 const CustomButton = styled.button`
-    background: var(--blue);
+    background: var(--black);
     color: white;
     width: 225px;
     min-height: 50px;

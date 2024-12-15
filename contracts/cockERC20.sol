@@ -278,4 +278,8 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
     function getLeaderboard() external view returns (address[leaderboardSize] memory, uint256[leaderboardSize] memory) {
         return (leaderboardAddresses, leaderboardContributions);
     }
+
+    function getContractDetails() public view returns (uint256, uint256, uint256, uint256, bool) {
+        return (tokenPrice, totalRaised, softCap, deadline, minContribution, isFinalized);
+    }
 }

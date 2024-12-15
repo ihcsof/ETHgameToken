@@ -9,6 +9,10 @@
 
 The website is located in the _crowdfunding_ folder.
 
+### `npm install`
+
+Runs the installation of dependencies.
+
 ### `npm start`
 
 Runs the app in the development mode.

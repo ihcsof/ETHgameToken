@@ -2,9 +2,11 @@ import { ethers } from 'ethers';
 
 // Contract ABI (simplified for this example)
 const contractABI = [
-  "function contribute() public payable",
-  "function withdraw() public",
-  "function getContractDetails() public view returns (uint, uint, uint)"
+  "function buyTokens() public payable",
+  "function claimRefund() public",
+  "function getLeaderboard() public view",
+  "function getContractDetails() public view",
+  "function getLeaderboard() external view"
 ];
 
 // The address of the deployed contract (update this with your contract address)
@@ -30,28 +32,40 @@ const getContractDetails = async () => {
   const contract = await getContract();
   const details = await contract.getContractDetails();
   return {
-    goal: details[0].toString(),
-    totalFunds: details[1].toString(),
-    balance: details[2].toString()
+    tokenPrice: details[0].toString(),
+    totalRaised: details[1].toString(),
+    softCap: details[2].toString(),
+    deadline: details[3].toString(),
+    minContribution: details[4].toString(),
+    isFinalized: details[5].toString(),
   };
 };
 
 // Contribute to the crowdfunding campaign
-const contribute = async (amount) => {
+const buyTokens = async (amount) => {
   const contract = await getContract();
-  const tx = await contract.contribute({
+  const tx = await contract.buyTokens({
     value: ethers.parseEther(amount)
   });
   await tx.wait(); // wait for transaction confirmation
   return tx;
 };
 
-// Withdraw funds (only for the contract owner)
-const withdraw = async () => {
+// If ICO fails, allow contributors to claim refund
+const claimRefund = async () => {
   const contract = await getContract();
   const tx = await contract.withdraw();
-  await tx.wait(); // wait for transaction confirmation
+  await tx.wait();
   return tx;
 };
 
-export { getContractDetails, contribute, withdraw };
+const getLeaderboard = async () => {
+  const contract = await getContract();
+  const details = await contract.getLeaderboard();
+  return {
+    leaderAddresses: details[0],
+    leaderContributions: details[1],
+  };
+};
+
+export { getContractDetails, buyTokens, claimRefund, getLeaderboard };

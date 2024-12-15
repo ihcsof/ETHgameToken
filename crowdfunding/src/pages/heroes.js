@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Nav from './nav';
 import CockCool from '../images/cool.png'
 import Footer from './footer';
+import { getLeaderboard } from '../ethereum';
 
 // Sample donation data (replace with actual data)
 const mockDonations = [
@@ -22,6 +23,22 @@ function Heroes() {
     setDonations(sortedDonations);
   }, []);
 
+  // Effect to fetch and sort leaderboard data
+  // useEffect(() => {
+  //   const fetchLeaderboard = async () => {
+  //     const leaderboard = await getLeaderboard();
+  //     const sortedDonations = leaderboard.leaderAddresses.map((address, index) => ({
+  //       address,
+  //       amount: leaderboard.leaderContributions[index],
+  //     })).sort((a, b) => b.amount - a.amount); // Sort by contributions in descending order
+
+  //     setDonations(sortedDonations);
+  //   };
+
+  //   fetchLeaderboard();
+  // }, []);
+
+
   const getIcon = (rank) => {
     switch (rank) {
       case 1:
@@ -39,30 +56,30 @@ function Heroes() {
     <Container>
       <Nav />
       <SubContainer>
-      <Section>
-        <BigHeader>Leaderboard</BigHeader>
-        <Table celled sortable>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Rank</Table.HeaderCell>
-              <Table.HeaderCell>Address</Table.HeaderCell>
-              <Table.HeaderCell>ETH Donated</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {donations.map((donation, index) => (
-              <Table.Row key={donation.address}>
-                <Table.Cell>{getIcon(index + 1)}</Table.Cell>
-                <Table.Cell>{donation.address}</Table.Cell>
-                <Table.Cell style={{ fontWeight: index < 3 ? 'bold' : 'normal' }}>{donation.amount} ETH</Table.Cell>
+        <Section>
+          <BigHeader>Leaderboard</BigHeader>
+          <Table celled sortable>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Rank</Table.HeaderCell>
+                <Table.HeaderCell>Address</Table.HeaderCell>
+                <Table.HeaderCell>ETH Donated</Table.HeaderCell>
               </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </Section>
-      <ImageContainer>
-        <Image src={CockCool} />
-      </ImageContainer>
+            </Table.Header>
+            <Table.Body>
+              {donations.map((donation, index) => (
+                <Table.Row key={donation.address}>
+                  <Table.Cell>{getIcon(index + 1)}</Table.Cell>
+                  <Table.Cell>{donation.address}</Table.Cell>
+                  <Table.Cell style={{ fontWeight: index < 3 ? 'bold' : 'normal' }}>{donation.amount} ETH</Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        </Section>
+        <ImageContainer>
+          <Image src={CockCool} />
+        </ImageContainer>
       </SubContainer>
       <Footer />
     </Container>

@@ -20,6 +20,11 @@ function Footer() {
         <SubText>
           This website does not have cookies. Yay!
         </SubText>
+        </Flex>
+        <Flex>
+        <BottomText>
+          Made by Lorenzo Foschi & Kevin Cattaneo
+        </BottomText>
       </Flex>
     </Container>
   );
@@ -61,11 +66,19 @@ const Text = styled.div`
 const SubText = styled.div`
   color: white; 
   font-family: "Fira Sans";
-  font-size: 18px;
+  font-size: 20px;
   font-style: bold;
-  font-weight: 200;
+  font-weight: 300;
   padding-top: 20px;
 `;
+
+const BottomText = styled.div`
+  color: white; 
+  font-family: "Fira Sans";
+  font-size: 16px;
+  font-style: bold;
+  font-weight: 200;
+  `;
 
 const Image = styled.img`
     width: 100px;
