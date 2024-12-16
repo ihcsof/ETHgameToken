@@ -141,9 +141,6 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
 
         // If the user sent more than required, refund the extra Ether
         uint256 refundAmount = ethAmount - requiredEth;
-        if (refundAmount > 0) {
-            payable(msg.sender).transfer(refundAmount);  // Refund the extra Ether to the sender
-        }
         
         totalRaised += msg.value;
         contributions[msg.sender] += msg.value;
@@ -153,6 +150,11 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         _transfer(address(this), msg.sender, tokenAmount);
 
         emit TokensPurchased(msg.sender, msg.value, tokenAmount);
+
+        // At the end to avoid reentrancy :D
+        if (refundAmount > 0) {
+            payable(msg.sender).transfer(refundAmount);  // Refund the extra Ether to the sender
+        }
 
         }
     }
