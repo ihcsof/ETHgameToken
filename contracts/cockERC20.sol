@@ -155,8 +155,6 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         if (refundAmount > 0) {
             payable(msg.sender).transfer(refundAmount);  // Refund the extra Ether to the sender
         }
-
-        }
     }
 
     /*
