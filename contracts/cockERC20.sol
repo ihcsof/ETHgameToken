@@ -10,7 +10,7 @@
 pragma solidity ^0.8.2;
 
 // Using OpenZeppelin's standard ERC20 implementation
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol"; 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
@@ -130,11 +130,21 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         require(block.timestamp <= deadline, "ICO duration is over");
         // No need to check if > 0, because minContribution is already > 0!
         require(msg.value >= minContribution, "Contribution is too small");
+        
+        uint256 ethAmount = msg.value;
+        uint256 tokenAmount = calculateTokensWithBonus(ethAmount);
+        uint256 requiredEth = tokenAmount * tokenPrice;  // The Ether equivalent for the tokens they should get
 
-        uint256 tokenAmount = calculateTokensWithBonus(msg.value);
+        // Then we have the token logic
         require(tokenAmount > 0, "No Cock for you ^_^");
         require(balanceOf(address(this)) >= tokenAmount, "Holy, u poor");
 
+        // If the user sent more than required, refund the extra Ether
+        uint256 refundAmount = ethAmount - requiredEth;
+        if (refundAmount > 0) {
+            payable(msg.sender).transfer(refundAmount);  // Refund the extra Ether to the sender
+        }
+        
         totalRaised += msg.value;
         contributions[msg.sender] += msg.value;
 
@@ -143,6 +153,8 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         _transfer(address(this), msg.sender, tokenAmount);
 
         emit TokensPurchased(msg.sender, msg.value, tokenAmount);
+
+        }
     }
 
     /*
@@ -279,7 +291,7 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         return (leaderboardAddresses, leaderboardContributions);
     }
 
-    function getContractDetails() public view returns (uint256, uint256, uint256, uint256, bool) {
+    function getContractDetails() public view returns (uint256, uint256, uint256, uint256, uint256, bool) {
         return (tokenPrice, totalRaised, softCap, deadline, minContribution, isFinalized);
     }
 }
