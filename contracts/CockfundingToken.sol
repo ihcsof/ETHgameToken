@@ -164,7 +164,7 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         If not, contributors can claim refunds:
             the Cock project didn't last for so long...
     */
-    function finalize() public onlyOwner {
+    function finalize() external onlyOwner {
         require(!isFinalized, "Already finalized");
         require(block.timestamp >= deadline, "C'mon we can't finish prematurely!");
 
@@ -192,7 +192,7 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         Allow contributors to claim a refund if the ICO failed.
         ( Can only be called after finalization if softCap wasn't met )
     */
-    function claimRefund() public {
+    function claimRefund() external {
         require(isFinalized, "Hold up! Not so fast :'(");
         require(!isSuccessful, "ICO was successful, go play with Cocks!");
 
@@ -291,7 +291,9 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
         return (leaderboardAddresses, leaderboardContributions);
     }
 
-    function getContractDetails() public view returns (uint256, uint256, uint256, uint256, uint256, bool) {
+    function getContractDetails() external view returns (uint256, uint256, uint256, uint256, uint256, bool) {
         return (tokenPrice, totalRaised, softCap, deadline, minContribution, isFinalized);
     }
+
 }
+
