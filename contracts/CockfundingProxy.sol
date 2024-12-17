@@ -29,7 +29,7 @@ contract CockfundingProxy is Ownable, Pausable {
     }
 
     receive() external payable whenNotPaused {
-        buyTokens();
+        return CockfundingToken(targetContract).buyTokens{value: msg.value}();
     }
 
     function pause() external onlyOwner {
