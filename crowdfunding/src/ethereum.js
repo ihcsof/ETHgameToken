@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-// Contract ABI (simplified for this example)
+// Contract ABI
 const contractABI = [
   "function buyTokens() public payable",
   "function claimRefund() public",
@@ -9,7 +9,6 @@ const contractABI = [
   "function getLeaderboard() external view"
 ];
 
-// The address of the deployed contract (update this with your contract address)
 const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
 // Get the Ethereum provider
@@ -59,6 +58,7 @@ const claimRefund = async () => {
   return tx;
 };
 
+// Get leaderboard
 const getLeaderboard = async () => {
   const contract = await getContract();
   const details = await contract.getLeaderboard();
