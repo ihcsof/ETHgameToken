@@ -3,14 +3,12 @@ import { ethers } from 'ethers';
 const contractABI = [
   "function buyTokens() public payable",
   "function claimRefund() public",
-  "function getLeaderboard() public view",
+  "function getLeaderboard() public view returns (address[5] memory, uint256[5] memory)",
   "function getContractDetails() public view returns (uint256, uint256, uint256, uint256, uint256)",
-  "function getLeaderboard() external view"
 ];
 
 const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
-// Get the Ethereum provider
 const getProvider = () => {
   if (typeof window.ethereum === "undefined") {
     throw new Error("Ethereum provider not found. Please install MetaMask or another Ethereum wallet.");
@@ -18,7 +16,6 @@ const getProvider = () => {
   return new ethers.BrowserProvider(window.ethereum);
 };
 
-// Connect to the contract
 const getContract = async () => {
   const provider = await getProvider();
   const signer = await provider.getSigner();

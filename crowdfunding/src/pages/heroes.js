@@ -6,38 +6,27 @@ import CockCool from '../images/cool.png'
 import Footer from './footer';
 import { getLeaderboard } from '../ethereum';
 
-// Sample donation data (replace with actual data)
-// const mockDonations = [
-//   { address: '0x12345552839398213', amount: 5.2 },
-//   { address: '0x45612345552839398', amount: 3.1 },
-//   { address: '0x78945612345552839', amount: 7.8 },
-//   { address: '0xabc45612345552839', amount: 2.5 },
-//   { address: '0xdef45612345552839', amount: 4.0 },
-// ];
-
 function Heroes() {
   const [donations, setDonations] = useState([]);
-
-  // useEffect(() => {
-  //   const sortedDonations = [...mockDonations].sort((a, b) => b.amount - a.amount);
-  //   setDonations(sortedDonations);
-  // }, []);
 
   // Effect to fetch and sort leaderboard data
   useEffect(() => {
     const fetchLeaderboard = async () => {
-      // const leaderboard = await getLeaderboard();
-      console.log(await getLeaderboard());
-      // const sortedDonations = leaderboard.leaderAddresses.map((address, index) => ({
-      //   address,
-      //   amount: leaderboard.leaderContributions[index],
-      // }))
-      // alert(sortedDonations);
-      // if (leaderboard.leaderAddresses.length > 1) {
-      //   sortedDonations.sort((a, b) => b.amount - a.amount);
-      // }
+      const leaderboard = await getLeaderboard();
+      const sortedDonations = leaderboard.leaderAddresses.map((address, index) => ({
+        address,
+        amount: leaderboard.leaderContributions[index],
+      }))
+      if (leaderboard.leaderAddresses.length > 1) {
+        sortedDonations.sort((a, b) => {
+          // Convert BigInt to Number safely using `Number()`
+          const amountA = Number(a.amount);
+          const amountB = Number(b.amount);
+          return amountB - amountA;
+        });
+      }
 
-      // setDonations(sortedDonations);
+      setDonations(sortedDonations);
     };
 
     fetchLeaderboard();
@@ -78,7 +67,7 @@ function Heroes() {
                     <Table.Cell>{getIcon(index + 1)}</Table.Cell>
                     <Table.Cell>{donation.address}</Table.Cell>
                     <Table.Cell style={{ fontWeight: index < 3 ? 'bold' : 'normal' }}>
-                      {donation.amount} ETH
+                      {Number(donation.amount)} wei
                     </Table.Cell>
                   </Table.Row>
                 ))
