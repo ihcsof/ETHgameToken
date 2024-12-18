@@ -92,7 +92,7 @@ contract CockfundingToken is ERC20, Ownable, Pausable {
     }
 
     /*
-     EMERGCENCY! The ICO can be paused.
+     EMERGENCY! The ICO can be paused.
      While paused, no one can buy tokens.
     */
     function pause() external onlyOwner {
