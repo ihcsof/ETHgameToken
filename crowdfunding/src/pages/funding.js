@@ -10,7 +10,6 @@ function Funding() {
   const [goal, setGoal] = useState(0);
   const [tokenPrice, setTokenPrice] = useState(0);
   const [totalFunds, setTotalFunds] = useState(0);
-  const [balance, setBalance] = useState(0);
   const [contributionAmount, setContributionAmount] = useState('');
   const [refundAmount, setRefundAmount] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -19,18 +18,15 @@ function Funding() {
   useEffect(() => {
     const fetchContractDetails = async () => {
       try {
-        // Fetch contract details from Ethereum
         const { tokenPrice, totalRaised, softCap, deadline, minContribution } = await getContractDetails();
 
-        // Assuming these are the correct variables returned from `getContractDetails`
-        setGoal(softCap); // Set the goal to softCap, assuming it's the goal
+        setGoal(softCap); // Set the goal to softCap
         setTotalFunds(totalRaised); // Set the total funds collected
-        setBalance(balance); // Set the current contract balance
         setDeadline(deadline); // Set the deadline
         setTokenPrice(tokenPrice); // Set the token price
         setMinContribution(minContribution); // Set the minimum contribution amount
       } catch (error) {
-        console.error('Error fetching contract details:', error);
+        alert('Error fetching contract details, contract says: \n'+ error.reason);
       }
     };
 
@@ -61,13 +57,11 @@ function Funding() {
       // Re-fetch for updates
       setGoal(softCap); // Set the goal to softCap, assuming it's the goal
       setTotalFunds(totalRaised); // Set the total funds collected
-      setBalance(balance); // Set the current contract balance
       setDeadline(deadline); // Set the deadline
       setTokenPrice(tokenPrice); // Set the token price
       setMinContribution(minContribution); // Set the minimum contribution amount
     } catch (error) {
-      alert('Contribution failed.');
-      console.error(error);
+      alert('Contribution failed, contract says: \n'+ error.reason);
     }
   };
 
@@ -83,13 +77,11 @@ function Funding() {
       // Re-fetch for updates
       setGoal(softCap); // Set the goal to softCap, assuming it's the goal
       setTotalFunds(totalRaised); // Set the total funds collected
-      setBalance(balance); // Set the current contract balance
       setDeadline(deadline); // Set the deadline
       setTokenPrice(tokenPrice); // Set the token price
       setMinContribution(minContribution); // Set the minimum contribution amount
     } catch (error) {
-      alert('Refund failed.');
-      console.error(error);
+      alert('Refund failed, contract says: \n'+ error.reason);
     }
   };
 
@@ -116,10 +108,6 @@ function Funding() {
                 <Table.Row>
                   <Table.Cell>Total Funds Collected</Table.Cell>
                   <Table.Cell>{totalFunds} ETH</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>Contract Balance</Table.Cell>
-                  <Table.Cell>{balance} ETH</Table.Cell>
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>Deadline</Table.Cell>
