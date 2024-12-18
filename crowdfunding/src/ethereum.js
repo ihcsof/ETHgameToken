@@ -2,9 +2,9 @@ import { ethers } from 'ethers';
 
 const contractABI = [
   "function buyTokens() public payable",
-  "function claimRefund() public",
-  "function getLeaderboard() public view returns (address[5] memory, uint256[5] memory)",
-  "function getContractDetails() public view returns (uint256, uint256, uint256, uint256, uint256)",
+  "function claimRefund() external",
+  "function getLeaderboard() external view returns (address[5] memory, uint256[5] memory)",
+  "function getContractDetails() external view returns (uint256, uint256, uint256, uint256, uint256)",
 ];
 
 const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
