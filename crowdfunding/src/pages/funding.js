@@ -26,7 +26,7 @@ function Funding() {
         setTokenPrice(tokenPrice); // Set the token price
         setMinContribution(minContribution); // Set the minimum contribution amount
       } catch (error) {
-        alert('Error fetching contract details, contract says: \n'+ error.reason);
+        alert('Error fetching contract details: \n' + error);
       }
     };
 
@@ -61,7 +61,10 @@ function Funding() {
       setTokenPrice(tokenPrice); // Set the token price
       setMinContribution(minContribution); // Set the minimum contribution amount
     } catch (error) {
-      alert('Contribution failed, contract says: \n'+ error.reason);
+      if (error.reason)
+        alert('Contribution failed, contract says: \n' + error.reason);
+      else
+        alert('Contribution failed: \n' + error);
     }
   };
 
@@ -81,7 +84,10 @@ function Funding() {
       setTokenPrice(tokenPrice); // Set the token price
       setMinContribution(minContribution); // Set the minimum contribution amount
     } catch (error) {
-      alert('Refund failed, contract says: \n'+ error.reason);
+      if (error.reason)
+        alert('Refund failed, contract says: \n' + error.reason);
+      else
+        alert('Refund failed: \n' + error);
     }
   };
 

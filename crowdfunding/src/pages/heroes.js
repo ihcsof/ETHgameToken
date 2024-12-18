@@ -7,36 +7,41 @@ import Footer from './footer';
 import { getLeaderboard } from '../ethereum';
 
 // Sample donation data (replace with actual data)
-const mockDonations = [
-  { address: '0x12345552839398213', amount: 5.2 },
-  { address: '0x45612345552839398', amount: 3.1 },
-  { address: '0x78945612345552839', amount: 7.8 },
-  { address: '0xabc45612345552839', amount: 2.5 },
-  { address: '0xdef45612345552839', amount: 4.0 },
-];
+// const mockDonations = [
+//   { address: '0x12345552839398213', amount: 5.2 },
+//   { address: '0x45612345552839398', amount: 3.1 },
+//   { address: '0x78945612345552839', amount: 7.8 },
+//   { address: '0xabc45612345552839', amount: 2.5 },
+//   { address: '0xdef45612345552839', amount: 4.0 },
+// ];
 
 function Heroes() {
   const [donations, setDonations] = useState([]);
 
-  useEffect(() => {
-    const sortedDonations = [...mockDonations].sort((a, b) => b.amount - a.amount);
-    setDonations(sortedDonations);
-  }, []);
+  // useEffect(() => {
+  //   const sortedDonations = [...mockDonations].sort((a, b) => b.amount - a.amount);
+  //   setDonations(sortedDonations);
+  // }, []);
 
   // Effect to fetch and sort leaderboard data
-  // useEffect(() => {
-  //   const fetchLeaderboard = async () => {
-  //     const leaderboard = await getLeaderboard();
-  //     const sortedDonations = leaderboard.leaderAddresses.map((address, index) => ({
-  //       address,
-  //       amount: leaderboard.leaderContributions[index],
-  //     })).sort((a, b) => b.amount - a.amount); // Sort by contributions in descending order
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      // const leaderboard = await getLeaderboard();
+      console.log(await getLeaderboard());
+      // const sortedDonations = leaderboard.leaderAddresses.map((address, index) => ({
+      //   address,
+      //   amount: leaderboard.leaderContributions[index],
+      // }))
+      // alert(sortedDonations);
+      // if (leaderboard.leaderAddresses.length > 1) {
+      //   sortedDonations.sort((a, b) => b.amount - a.amount);
+      // }
 
-  //     setDonations(sortedDonations);
-  //   };
+      // setDonations(sortedDonations);
+    };
 
-  //   fetchLeaderboard();
-  // }, []);
+    fetchLeaderboard();
+  }, []);
 
 
   const getIcon = (rank) => {
@@ -67,13 +72,21 @@ function Heroes() {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {donations.map((donation, index) => (
-                <Table.Row key={donation.address}>
-                  <Table.Cell>{getIcon(index + 1)}</Table.Cell>
-                  <Table.Cell>{donation.address}</Table.Cell>
-                  <Table.Cell style={{ fontWeight: index < 3 ? 'bold' : 'normal' }}>{donation.amount} ETH</Table.Cell>
+              {donations && donations.length > 0 ? (
+                donations.map((donation, index) => (
+                  <Table.Row key={donation.address}>
+                    <Table.Cell>{getIcon(index + 1)}</Table.Cell>
+                    <Table.Cell>{donation.address}</Table.Cell>
+                    <Table.Cell style={{ fontWeight: index < 3 ? 'bold' : 'normal' }}>
+                      {donation.amount} ETH
+                    </Table.Cell>
+                  </Table.Row>
+                ))
+              ) : (
+                <Table.Row>
+                  <Table.Cell colSpan="3" textAlign="center"><strong>No one has donated yet!</strong></Table.Cell>
                 </Table.Row>
-              ))}
+              )}
             </Table.Body>
           </Table>
         </Section>
