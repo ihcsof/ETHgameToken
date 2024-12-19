@@ -7,7 +7,7 @@
 
 # How-to
 
-The website is located in the _crowdfunding_ folder.
+The website is located in the _crowdfunding_ folder, so please position yourself there to run the following.
 
 ### `npm install`
 
